@@ -17,4 +17,3 @@ def scrapeTiobe():
     
 
     return [language.find_next("td").text for language in top20_elem]
-
