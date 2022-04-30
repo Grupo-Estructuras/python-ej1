@@ -1,7 +1,7 @@
 import requests
+import common.exceptions
 from bs4 import BeautifulSoup
 
-import common.exceptions
 
 def scrapeTiobe():
     tiobePage = requests.get("https://www.tiobe.com/tiobe-index/")
