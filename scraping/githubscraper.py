@@ -32,7 +32,8 @@ def scrapeGithub(languages):
                 gitLenCant = re.search("\d+(,\d*)*",gitLenCant).group()
                 gitLenCant = int(gitLenCant.replace(",", ""))
 
-                min = min if min < gitLenCant else gitLenCant
+                
+                min = min if min < gitLenCant and min != 0  else gitLenCant
                 max = max if max > gitLenCant else gitLenCant
 
                 langItem = {
