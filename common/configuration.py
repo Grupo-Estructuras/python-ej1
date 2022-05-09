@@ -1,11 +1,6 @@
 import argparse
-from distutils.command.config import config
 import json
 import logging
-from scraping.tiobescraper import scrapeTiobe
-from scraping.githubscraper import scrapeGithub
-from graph.barChart import createBarChart
-from common import exceptions
 
 
 def configure():
@@ -60,37 +55,3 @@ def configure():
             "No se pudo abrir archivo. Usando configuración predeterminada...")
 
     return defconfig
-
-
-def main():
-    config = configure()
-
-    languages = []
-    if not config["usar_lista_fija"]:
-        try:
-            languages = scrapeTiobe(config["scraper"]["tiobe_site_format"])
-        except exceptions.RequestException as err:
-            logging.error(
-                f"No se pudo conectar con la página tiobe. Verifique su conexión. Error: {err}")
-            return -1
-    else:
-        languages = config["lista_lenguajes"]
-
-    try:
-        langDataArr = scrapeGithub(
-            languages, config["scraper"], config["archivo_resultado"])
-    except exceptions.RequestException as err:
-        logging.error(
-            f"No se pudo conectar con la página github. Verifique su conexión. Error: {err}")
-        return -1
-
-    position = 0
-    for language in langDataArr:
-        position += 1
-        print(
-            f"{str(position)} - {language['name']},{language['rating']},{language['repoAmmount']}")
-
-    createBarChart(langDataArr)
-
-
-main()
