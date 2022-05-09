@@ -10,11 +10,11 @@ def scrapeGithub(languages):
     langList = []
     min = 0
     max = 0
-    
+
     with open("./data/langAliases.json") as jsonFile:
         with open("./data/Resultados.txt", "w") as resultsFile:
             aliases = json.load(jsonFile)
-            
+
             for language in languages:
                 try:
                     langAlias = aliases[language.lower()]
@@ -27,13 +27,13 @@ def scrapeGithub(languages):
                 if gitpage.status_code != 200:
                     raise common.exceptions.RequestException()
 
-                githubsoup = BeautifulSoup(gitpage.text, features="html.parser")
+                githubsoup = BeautifulSoup(
+                    gitpage.text, features="html.parser")
                 gitLenCant = githubsoup.find(class_="h3 color-fg-muted").text
-                gitLenCant = re.search("\d+(,\d*)*",gitLenCant).group()
+                gitLenCant = re.search("\d+(,\d*)*", gitLenCant).group()
                 gitLenCant = int(gitLenCant.replace(",", ""))
 
-                
-                min = min if min < gitLenCant and min != 0  else gitLenCant
+                min = min if min < gitLenCant and min != 0 else gitLenCant
                 max = max if max > gitLenCant else gitLenCant
 
                 langItem = {
@@ -42,15 +42,16 @@ def scrapeGithub(languages):
                     "rating": 0
                 }
 
-                resultsFile.write(langItem["name"] + "," + str(langItem["repoAmmount"]) + "\n")
+                resultsFile.write(
+                    langItem["name"] + "," + str(langItem["repoAmmount"]) + "\n")
                 langList.append(langItem)
                 print(f"Reading...{language}")
 
-    return magicSorter(min, max, langList)
+    return ratingSorter(min, max, langList)
 
 
 # Adds rating to each item and returns the list sorted by rating
-def magicSorter(min, max, list):
+def ratingSorter(min, max, list):
     for item in list:
         item["rating"] = (item["repoAmmount"] - min) / (max - min) * 100
 
