@@ -8,7 +8,7 @@ import iso8601
 from bs4 import BeautifulSoup
 
 
-def scrapeGithub(languages, config, resultfile):
+def scrapeGithub(languages, config, result_file_name):
     langList = []
     min = 0
     max = 0
@@ -17,7 +17,7 @@ def scrapeGithub(languages, config, resultfile):
 
     resultfile = None
     try:
-        resultfile = open(resultfile, "w")
+        resultfile = open(result_file_name, "w")
     except IOError:
         logging.error(
             "No se pudo abrir un archivo para resultados. No se guardarán los resultados!")
