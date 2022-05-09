@@ -1,53 +1,70 @@
 import re
 import json
+import threading
 import requests
 import common.exceptions
 from asyncio import exceptions
 from bs4 import BeautifulSoup
 
 
-def scrapeGithub(languages):
+def scrapeGithub(languages, config, resultfile):
     langList = []
     min = 0
     max = 0
 
-    with open("./data/langAliases.json") as jsonFile:
-        with open("./data/Resultados.txt", "w") as resultsFile:
-            aliases = json.load(jsonFile)
+    aliases = config["aliases"]
+    with open(resultfile, "w") as resultsFile:
+        gitpages = []
+        threads = []
+        for language in languages:
+            try:
+                langAlias = aliases[language]
+            except KeyError:
+                langAlias = language
 
-            for language in languages:
-                try:
-                    langAlias = aliases[language.lower()]
-                except KeyError:
-                    langAlias = language
+            link = str.format(config["github_site_format"], langAlias)
+            print(link)
 
-                link = f"https://github.com/topics/{langAlias}"
-                gitpage = requests.get(link)
+            sem = threading.Semaphore(config["max_parallel"])
+            threads.append(threading.Thread(
+                target=language_read, args=(link, gitpages, sem, language)))
 
-                if gitpage.status_code != 200:
-                    raise common.exceptions.RequestException()
+        for thread in threads:
+            thread.start()
+        for thread in threads:
+            thread.join()
 
-                githubsoup = BeautifulSoup(
-                    gitpage.text, features="html.parser")
-                gitLenCant = githubsoup.find(class_="h3 color-fg-muted").text
-                gitLenCant = re.search("\d+(,\d*)*", gitLenCant).group()
-                gitLenCant = int(gitLenCant.replace(",", ""))
+        for gitpage in gitpages:
+            if gitpage[0].status_code != 200:
+                print(gitpage[0].status_code)
+                raise common.exceptions.RequestException()
 
-                min = min if min < gitLenCant and min != 0 else gitLenCant
-                max = max if max > gitLenCant else gitLenCant
+            githubsoup = BeautifulSoup(
+                gitpage[0].text, features="html.parser")
+            gitLenCant = githubsoup.find(class_="h3 color-fg-muted").text
+            gitLenCant = re.search("\d+(,\d*)*", gitLenCant).group()
+            gitLenCant = int(gitLenCant.replace(",", ""))
 
-                langItem = {
-                    "name": language,
-                    "repoAmmount": gitLenCant,
-                    "rating": 0
-                }
+            min = min if min < gitLenCant and min != 0 else gitLenCant
+            max = max if max > gitLenCant else gitLenCant
 
-                resultsFile.write(
-                    langItem["name"] + "," + str(langItem["repoAmmount"]) + "\n")
-                langList.append(langItem)
-                print(f"Reading...{language}")
+            langItem = {
+                "name": gitpage[1],
+                "repoAmmount": gitLenCant,
+                "rating": 0
+            }
+
+            resultsFile.write(
+                langItem["name"] + "," + str(langItem["repoAmmount"]) + "\n")
+            langList.append(langItem)
 
     return ratingSorter(min, max, langList)
+
+
+def language_read(link, pages, sem, language):
+    sem.acquire()
+    pages.append((requests.get(link), language))
+    sem.release()
 
 
 # Adds rating to each item and returns the list sorted by rating

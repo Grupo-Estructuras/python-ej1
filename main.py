@@ -2,8 +2,6 @@ import argparse
 from distutils.command.config import config
 import json
 import logging
-from zipfile import _ReadWriteMode
-from yaml import parse
 from scraping.tiobescraper import scrapeTiobe
 from scraping.githubscraper import scrapeGithub
 from graph.barChart import createBarChart
@@ -27,7 +25,7 @@ def configure():
             "retry_delays_ms": [
                 300,
                 600,
-                1200,
+                1200
             ],
             "max_pages_interest": 10,
             "interest": "sort",
@@ -46,11 +44,16 @@ def configure():
     try:
         with open(args.config, "r+") as configfile:
             # Cargar valores que se encuentran en archivo
-            defconfig.update(json.load(configfile))
+            try:
+                defconfig.update(json.load(configfile))
+            except json.decoder.JSONDecodeError as err:
+                logging.warning(
+                    f"No se reconoce el archivo de configuración: {err}. Sobreescribiendo...")
+                pass
 
             # Volver a escribir (en caso de que alguna información no se encontraba inicialmente en el archivo)
             configfile.seek(0)
-            json.dump(defconfig, configfile)
+            json.dump(defconfig, configfile, indent=4)
             configfile.truncate()
     except IOError:
         logging.warning(
@@ -63,18 +66,19 @@ def main():
     config = configure()
 
     languages = []
-    if not config.usar_lista_fija:
+    if not config["usar_lista_fija"]:
         try:
-            languages = scrapeTiobe()
+            languages = scrapeTiobe(config["scraper"]["tiobe_site_format"])
         except exceptions.RequestException as err:
             logging.error(
                 f"No se pudo conectar con la página tiobe. Verifique su conexión. Error: {err}")
             return -1
     else:
-        languages = config.lista_lenguajes
+        languages = config["lista_lenguajes"]
 
     try:
-        langDataArr = scrapeGithub(languages, config.scraper)
+        langDataArr = scrapeGithub(
+            languages, config["scraper"], config["archivo_resultado"])
     except exceptions.RequestException as err:
         logging.error(
             f"No se pudo conectar con la página github. Verifique su conexión. Error: {err}")
