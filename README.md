@@ -17,4 +17,4 @@ Para ejecutar se necesita las librerias de requirements.txt. Se pueden instalar 
 Además se puede instalar autopep8 que fue utilizado para el formato de todos los códigos.
 
 Se recomienda Python 3.9.7 para ejecutar los códigos. 
-Con ```python``` como Python 3.9.7 se ejecuta simplemente ```python ejercicio_1.go``` o ```python ejercicio_1.go``` desde el directorio de este archivo para probar ejercicio 1 o 2 del trabajo respectivamente.
+Con ```python``` como Python 3.9.7 se ejecuta simplemente ```python ejercicio_1.py``` o ```python ejercicio_1.py``` desde el directorio de este archivo para probar ejercicio 1 o 2 del trabajo respectivamente.
