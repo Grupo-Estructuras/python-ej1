@@ -79,11 +79,20 @@ def scrapeGithub(languages, config, result_file_name):
     return ratingSorter(min, max, langList)
 
 
-def scrapeInterest(config):
+def scrapeInterest(config, result_file_name):
     topics = {}
     topiclist = []
     gitpages = []
     threads = []
+
+    # Verificar que archivo resultado se puede abrir
+    resultfile = None
+    try:
+        resultfile = open(result_file_name, "w")
+    except IOError:
+        logging.error(
+            "No se pudo abrir un archivo para resultados. No se guardarán los resultados!")
+
     for page in range(0, config["max_pages_interest"]):
         # Usamos página +1 ya que github empieza en página 1
         link = str.format(
@@ -123,6 +132,8 @@ def scrapeInterest(config):
             for tag in tags:
                 key = re.sub("\s+", " ", tag.text)
                 topics[key] = topics.get(key, 0) + 1
+                if resultfile != None:
+                    resultfile.write(key+"\n")
 
     # Guardar en lista
     for key in topics:

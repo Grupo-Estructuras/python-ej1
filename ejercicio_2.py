@@ -8,7 +8,7 @@ def main():
     config = configure()
 
     # Obtener datos de github
-    topics = scrapeInterest(config["scraper"])
+    topics = scrapeInterest(config["scraper"], config["archivo_resultado"])
     for topic in topics:
         print(f"{topic[0]}:{topic[1]}")
 
