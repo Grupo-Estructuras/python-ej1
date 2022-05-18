@@ -15,6 +15,7 @@ def scrapeGithub(languages, config, result_file_name):
 
     aliases = config["aliases"]
 
+    # Verificar que archivo resultado se puede abrir
     resultfile = None
     try:
         resultfile = open(result_file_name, "w")
@@ -22,6 +23,7 @@ def scrapeGithub(languages, config, result_file_name):
         logging.error(
             "No se pudo abrir un archivo para resultados. No se guardarán los resultados!")
 
+    # Preparar listas para threads y sus resultados
     gitpages = []
     threads = []
     for language in languages:
@@ -37,11 +39,13 @@ def scrapeGithub(languages, config, result_file_name):
         threads.append(threading.Thread(
             target=language_read, args=(link, gitpages, sem, language)))
 
+    # Accedemos a github en páginas paralelas
     for thread in threads:
         thread.start()
     for thread in threads:
         thread.join()
 
+    # Procesar página por página
     for gitpage in gitpages:
         if gitpage[0].status_code != 200:
             print(gitpage[0].status_code)
@@ -67,8 +71,11 @@ def scrapeGithub(languages, config, result_file_name):
                 langItem["name"] + "," + str(langItem["repoAmmount"]) + "\n")
         langList.append(langItem)
 
+    # Si pudimos obtener acceso a archivo guardar
     if resultfile != None:
         resultfile.close()
+
+    # Ordenar resultados
     return ratingSorter(min, max, langList)
 
 
@@ -92,6 +99,7 @@ def scrapeInterest(config):
     for thread in threads:
         thread.join()
 
+    # Procesar página por página
     for gitpage in gitpages:
         if gitpage.status_code != 200:
             print(gitpage.status_code)
@@ -116,6 +124,7 @@ def scrapeInterest(config):
                 key = re.sub("\s+", " ", tag.text)
                 topics[key] = topics.get(key, 0) + 1
 
+    # Guardar en lista
     for key in topics:
         topiclist.append((key, topics[key]))
     return sorted(topiclist, key=lambda i: i[1], reverse=True)

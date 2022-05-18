@@ -7,6 +7,7 @@ from common import exceptions
 
 
 def main():
+    # Se lee archivo configuración
     config = configure()
 
     languages = []
@@ -20,6 +21,7 @@ def main():
     else:
         languages = config["lista_lenguajes"]
 
+    # Obtener información de github
     try:
         langDataArr = scrapeGithub(
             languages, config["scraper"], config["archivo_resultado"])
@@ -34,6 +36,7 @@ def main():
         print(
             f"{str(position)} - {language['name']},{language['rating']},{language['repoAmmount']}")
 
+    # Graficar y mostrar en pantalla
     graphLanguages(langDataArr)
 
 
