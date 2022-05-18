@@ -12,9 +12,7 @@ Esta configuración permite:
 El archivo de configuración también se puede pasar como argumento de consola.
 
 ## Como ejecutar
-Para ejecutar se necesita las siguientes librerías (con sus respectivas dependencias):
-- beautifulsoup4
-- iso8601
+Para ejecutar se necesita las librerias de requirements.txt. Se pueden instalar con ```pip install -r requirements.txt```
 
 Además se puede instalar autopep8 que fue utilizado para el formato de todos los códigos.
 
