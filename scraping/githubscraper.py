@@ -33,7 +33,7 @@ def scrapeGithub(languages, config, result_file_name):
             langAlias = language
 
         link = str.format(config["github_site_format"], langAlias)
-        print(link)
+        print("Accediendo a " + link)
 
         sem = threading.Semaphore(config["max_parallel"])
         threads.append(threading.Thread(
@@ -48,7 +48,7 @@ def scrapeGithub(languages, config, result_file_name):
     # Procesar página por página
     for gitpage in gitpages:
         if gitpage[0].status_code != 200:
-            print(gitpage[0].status_code)
+            print("Error página retorno código: " + gitpage[0].status_code)
             raise common.exceptions.RequestException()
 
         githubsoup = BeautifulSoup(
@@ -88,7 +88,7 @@ def scrapeInterest(config):
         # Usamos página +1 ya que github empieza en página 1
         link = str.format(
             config["github_interest_format"], config["interest"], page+1)
-        print(link)
+        print("Accediendo a " + link)
 
         sem = threading.Semaphore(config["max_parallel"])
         threads.append(threading.Thread(
@@ -102,7 +102,7 @@ def scrapeInterest(config):
     # Procesar página por página
     for gitpage in gitpages:
         if gitpage.status_code != 200:
-            print(gitpage.status_code)
+            print("Error página retorno código: " + gitpage.status_code)
             raise common.exceptions.RequestException()
 
         githubsoup = BeautifulSoup(
