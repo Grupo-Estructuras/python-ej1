@@ -48,7 +48,8 @@ def scrapeGithub(languages, config, result_file_name):
     # Procesar página por página
     for gitpage in gitpages:
         if gitpage[0].status_code != 200:
-            print("Error página retorno código: " + gitpage[0].status_code)
+            print("Error página retorno código: " +
+                  str(gitpage[0].status_code))
             raise common.exceptions.RequestException()
 
         githubsoup = BeautifulSoup(
@@ -111,7 +112,7 @@ def scrapeInterest(config, result_file_name):
     # Procesar página por página
     for gitpage in gitpages:
         if gitpage.status_code != 200:
-            print("Error página retorno código: " + gitpage.status_code)
+            print("Error página retorno código: " + str(gitpage.status_code))
             raise common.exceptions.RequestException()
 
         githubsoup = BeautifulSoup(

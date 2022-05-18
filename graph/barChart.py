@@ -17,7 +17,7 @@ def graphInterest(tags):
     tagnames = [tag[0] for tag in tags]
     nums = [tag[1] for tag in tags]
 
-    plt.bar(tagnames[0:10], nums[0:10], color='orange', width=0.420)
+    plt.bar(tagnames[0:20], nums[0:20], color='orange', width=0.420)
     plt.xlabel("Topics asociados")
     plt.ylabel("Apariciones")
     plt.show()
